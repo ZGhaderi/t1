@@ -1,114 +1,108 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+// import React, { Component } from "react";
+// import { ScrollView } from "react-native";
+// import SensorView from "./SensorView";
 
-import React, {Fragment} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+// const axis = ["x", "y", "z"];
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// const availableSensors = {
+//   accelerometer: axis,
+//   gyroscope: axis,
+//   magnetometer: axis,
+//  // barometer: ["pressure"]
+// };
+// const viewComponents = Object.entries(availableSensors).map(([name, values]) =>
+//   SensorView(name, values)
+// );
 
-const App = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+// export default class App extends Component {
+//   render() {
+//     return (
+//       <ScrollView>
+//         {viewComponents.map((Comp, index) => <Comp key={index} />)}
+//       </ScrollView>
+//     );
+//   }
+// }
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+import React, { Component } from "react";
+import {AppRegistry, View , Text ,StyleSheet, Image, Dimensions } from "react-native";
+import {accelerometer} from "react-native-sensors";
+import { setUpdateIntervalForType, SensorTypes } from "react-native-sensors";
+
+const instructions = Platform.select({
+  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+  android:
+    'Double tap R on your keyboard to reload,\n' +
+    'Shake or press menu button for dev menu',
 });
 
-export default App;
+const responsiveWidth = Dimensions.get('screen').width;
+const responsiveHeight = Dimensions.get('screen').height;
+
+export default class App extends Component {
+  constructor(){
+    super();
+    this.state= {
+      data: {x: 0,
+            y: 0,
+            z: 0,
+          }
+      };
+  }
+
+  componentDidMount(){
+    setUpdateIntervalForType(SensorTypes.accelerometer, 120);
+    accelerometer.subscribe(({ x, y, z }) => {
+      this.setState({data : {x,y,z}})
+    })
+    accelerometer.subscribe(item => {
+      this.setState({movement: item.x *-100 + 120});
+     console.log( item.x + ' ' + item.y + ' ' + item.z + ' ' + item.timestamp );
+    });
+     
+  }
+
+  render() {  
+    return (
+      <View style={styles.cont}>
+        <Image source={require("./assets/road.gif")} style={{ width: responsiveWidth, height: responsiveHeight * 0.3}}/>
+        <Image source={require("./assets/car.png")} style={{width: 70, height: 50, flex: 1, 
+            position: 'absolute', left: this.state.movement}}/>
+        <Text style={styles.txt}>X : {this.state.data.x}</Text>
+        <Text style={styles.txt}>Y : {this.state.data.y}</Text>
+        <Text style={styles.txt}>Z : {this.state.data.z}</Text>
+      </View>
+    );
+  }
+}
+
+const styles=StyleSheet.create({
+  cont:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  txt:{
+    marginHorizontal: 20,
+    fontSize: 20
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+})
+
+AppRegistry.registerComponent('App',()=> App)
