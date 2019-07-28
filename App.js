@@ -39,6 +39,7 @@ const instructions = Platform.select({
 const responsiveWidth = Dimensions.get('screen').width;
 const responsiveHeight = Dimensions.get('screen').height;
 
+
 export default class App extends Component {
   constructor(){
     super();
@@ -46,8 +47,12 @@ export default class App extends Component {
       data: {x: 0,
             y: 0,
             z: 0,
-          }
+          },
+          movementx: 0,
+          movementy: 0,
+          movementz: 0,
       };
+     // this.moveAnimation = new Animated.ValueXY({ x: 10, y: 450 })
   }
 
   componentDidMount(){
@@ -56,7 +61,9 @@ export default class App extends Component {
       this.setState({data : {x,y,z}})
     })
     accelerometer.subscribe(item => {
-      this.setState({movement: item.x *-100 + 120});
+      this.setState({movementx: item.x *-100 + 120});
+      this.setState({movementy: item.y *-100 + 270});
+      this.setState({movementz: item.z *-100 + 270});
      console.log( item.x + ' ' + item.y + ' ' + item.z + ' ' + item.timestamp );
     });
      
@@ -67,10 +74,13 @@ export default class App extends Component {
       <View style={styles.cont}>
         <Image source={require("./assets/road.gif")} style={{ width: responsiveWidth, height: responsiveHeight * 0.3}}/>
         <Image source={require("./assets/car.png")} style={{width: 70, height: 50, flex: 1, 
-            position: 'absolute', left: this.state.movement}}/>
+            position: 'absolute', left: this.state.movementx, top: this.state.movementy}}/>
         <Text style={styles.txt}>X : {this.state.data.x}</Text>
         <Text style={styles.txt}>Y : {this.state.data.y}</Text>
         <Text style={styles.txt}>Z : {this.state.data.z}</Text>
+        <Text style={styles.txt}>movementx : {this.state.movementx}</Text>
+        <Text style={styles.txt}>movementy : {this.state.movementy}</Text>
+        <Text style={styles.txt}>movementz : {this.state.movementz}</Text>
       </View>
     );
   }
