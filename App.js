@@ -29,6 +29,7 @@ import {AppRegistry, View , Text ,StyleSheet, Image, Dimensions } from "react-na
 import {accelerometer} from "react-native-sensors";
 import { setUpdateIntervalForType, SensorTypes } from "react-native-sensors";
 
+
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -48,11 +49,10 @@ export default class App extends Component {
             y: 0,
             z: 0,
           },
-          movementx: 0,
-          movementy: 0,
-          movementz: 0,
+       movementx: 0,
+       movementy: 0,
+       movementz: 0, 
       };
-     // this.moveAnimation = new Animated.ValueXY({ x: 10, y: 450 })
   }
 
   componentDidMount(){
@@ -61,12 +61,26 @@ export default class App extends Component {
       this.setState({data : {x,y,z}})
     })
     accelerometer.subscribe(item => {
-      this.setState({movementx: item.x *-100 + 120});
-      this.setState({movementy: item.y *-100 + 270});
+      var movementx = item.x *-100 + 120;
+      if(movementx<0){
+        movementx = 0;
+      }
+      else if(movementx > 340){
+        movementx = 340;
+      }
+      var movementy = item.y *100 + 290;
+      if(movementy<0){
+        movementy = 0;
+      }
+      else if(movementy > 340){
+        movementy = 340;
+      }
+      
+      this.setState({movementx});
+      this.setState({movementy});
       this.setState({movementz: item.z *-100 + 270});
      console.log( item.x + ' ' + item.y + ' ' + item.z + ' ' + item.timestamp );
-    });
-     
+    });  
   }
 
   render() {  
@@ -81,6 +95,7 @@ export default class App extends Component {
         <Text style={styles.txt}>movementx : {this.state.movementx}</Text>
         <Text style={styles.txt}>movementy : {this.state.movementy}</Text>
         <Text style={styles.txt}>movementz : {this.state.movementz}</Text>
+        
       </View>
     );
   }
